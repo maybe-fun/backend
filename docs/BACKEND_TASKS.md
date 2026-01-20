@@ -174,7 +174,7 @@ src/
 
 ### 2.1 Reference Schema
 
-**IMPORTANT:** The complete database schema is defined in `/db-schema.txt`. Use this as the **source of truth** for all TypeORM entity creation.
+**IMPORTANT:** The complete database schema is defined in [https://dbdiagram.io/d/MAYBE-FUN-COMPLETE-DATABASE-SCHEMA-695e2c6b39fa3db27b5500c8](https://dbdiagram.io/d/MAYBE-FUN-COMPLETE-DATABASE-SCHEMA). Use this as the **source of truth** for all TypeORM entity creation.
 
 The schema includes:
 - 40+ tables with full column definitions
