@@ -9,8 +9,10 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { UserSession } from './user-session.entity';
+import { UserBalance } from './user-balance.entity';
 
 /**
  * ENUMS
@@ -44,6 +46,9 @@ export class User {
   @Index({ unique: true })
   @Column({ type: 'varchar', length: 44 })
   walletAddress: string;
+
+  @OneToOne(() => UserBalance, (balance) => balance.user)
+  balance: UserBalance;
 
   @Index()
   @Column({ type: 'varchar', length: 50, nullable: true, unique: true })

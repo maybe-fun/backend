@@ -10,6 +10,7 @@ export default function configuration() {
     auth: {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_ACCESS_TTL,
+      refreshExpiresIn: process.env.JWT_REFRESH_TTL,
     },
     redis: {
       host: process.env.REDIS_HOST,

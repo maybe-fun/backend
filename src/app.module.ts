@@ -8,14 +8,22 @@ import { join } from 'path';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { BullModule } from '@nestjs/bull';
+import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponserInterceptor } from './common/interceptor/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/exception.filter';
+import { MarketsModule } from './modules/markets/markets.module';
+import { CacheModule } from './common/cache/cache.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './modules/user/user.module';
+import { GuardModule } from './common/guards/guard.module';
 
 @Module({
   imports: [
+    JwtModule,
+    CacheModule,
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -80,6 +88,10 @@ import { HttpExceptionFilter } from './common/filters/exception.filter';
       inject: [ConfigService],
     }),
     ScheduleModule.forRoot(),
+    MarketsModule,
+    AuthModule,
+    UserModule,
+    GuardModule,
   ],
   controllers: [AppController],
   providers: [

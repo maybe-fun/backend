@@ -19,7 +19,7 @@ export class ResponserInterceptor implements NestInterceptor {
         success: true,
         statusCode,
         message: 'Request successful',
-        ...data,
+        data,
       })),
     );
   }
