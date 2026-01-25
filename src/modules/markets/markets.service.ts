@@ -29,10 +29,16 @@ export class MarketsService {
 
     // 2. Save Draft
     const draft = this.draftRepo.create({
-      ...dto,
+      categoryId: dto.category_id,
+      description: dto.description,
+      imageUrl: dto.image_url,
+      question: dto.question,
+      resolutionCriteria: dto.resolution_criteria,
+      resolutionSource: dto.resolution_source,
+      topicIds: dto.topic_ids,
       creatorId: user.id,
       creatorWallet: user.wallet,
-      questionUri: '',
+      questionUri: `http://example.com/markets/draft/${Date.now()}`,
       tradingCloseTs: dto.trading_close_ts.toString(),
       linked: false,
     });
