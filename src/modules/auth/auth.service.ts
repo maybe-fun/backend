@@ -29,9 +29,9 @@ export class AuthService {
       publicKey: wallet_address,
     });
 
-    // if (!isValid) {
-    //   throw new UnauthorizedException('Invalid signature');
-    // }
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid signature');
+    }
 
     let user = await this.userService.findByWallet(wallet_address);
     if (!user) {

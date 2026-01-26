@@ -24,17 +24,6 @@ import { GuardModule } from './common/guards/guard.module';
   imports: [
     JwtModule,
     CacheModule,
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('redis.host', 'localhost'),
-          port: configService.get('redis.port', 6379),
-          password: configService.get('redis.password'),
-        },
-      }),
-      inject: [ConfigService],
-    }),
     TypeOrmModule.forRootAsync({
       imports: [
         ConfigModule.forRoot({
@@ -51,7 +40,7 @@ import { GuardModule } from './common/guards/guard.module';
         password: configService.get('database.password'),
         database: configService.get('database.database'),
         url: configService.get('DATABASE_URL'),
-        synchronize: true,
+        synchronize: configService.get('env') === 'development',
         migrationsRun: true,
         migrations: ['dist/migrations/*{.ts,.js}'],
         logging: configService.get('env') !== 'production' ? 'all' : ['error'],

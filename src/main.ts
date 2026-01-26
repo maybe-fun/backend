@@ -23,7 +23,7 @@ async function bootstrap() {
     origin: '*',
   });
   app.use(express.urlencoded({ extended: true }));
-  app.useBodyParser('json', { limit: '300mb' });
+  app.useBodyParser('json', { limit: '10mb' });
 
   const port = config.port ?? 5000;
   console.log('Listening on: ', `http://0.0.0.0:${port}`);

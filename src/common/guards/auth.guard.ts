@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     @InjectRepository(User)
-    private readonly userUsepository: Repository<User>,
+    private readonly userRepository: Repository<User>,
     private readonly config: ConfigService,
   ) {}
 
@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
         secret: this.config.get('auth.secret'),
       });
 
-      const user = await this.userUsepository.findOne({
+      const user = await this.userRepository.findOne({
         where: { id: payload.sub },
       });
 

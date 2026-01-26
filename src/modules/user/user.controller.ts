@@ -11,7 +11,6 @@ export class UserController {
   @Authenticate()
   @Get('me')
   async getProfile(@AuthUser() user: User) {
-    console.log(user);
     return await this.userService.getFullProfile(user.id);
   }
 }
