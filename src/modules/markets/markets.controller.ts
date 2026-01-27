@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { MarketsService } from './markets.service';
-import { GetUserMarketsDto } from './dto/get-user-markets.dto';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { User } from 'src/entities/user.entity';
@@ -11,8 +10,8 @@ import { MarketFiltersDto } from './dto/get-markets-with-filters.dto';
 export class MarketsController {
   constructor(private readonly marketsService: MarketsService) {}
 
-  @Authenticate()
   @Post()
+  @Authenticate()
   async createMarket(@AuthUser() user: User, @Body() dto: CreateMarketDto) {
     return this.marketsService.createDraft(dto, {
       id: user.id,
@@ -20,8 +19,8 @@ export class MarketsController {
     });
   }
 
-  @Authenticate()
   @Get()
+  @Authenticate()
   async getMarkets(@Query() query: MarketFiltersDto) {
     return await this.marketsService.findAll(query);
   }
@@ -31,12 +30,13 @@ export class MarketsController {
     return await this.marketsService.getTrending();
   }
 
-  @Authenticate()
-  @Get(':wallet/markets')
-  async getUserMarkets(
-    @Param('wallet') wallet: string,
-    @Query() query: GetUserMarketsDto,
-  ) {
-    return this.marketsService.findByWallet(wallet, query);
+  @Get('closing-soon')
+  async closingSoon() {
+    return this.marketsService.getClosingSoonMarkets();
+  }
+
+  @Get(':slug')
+  async getMarket(@Param('slug') slug: string) {
+    return this.marketsService.getMarketBySlug(slug);
   }
 }

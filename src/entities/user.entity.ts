@@ -13,6 +13,7 @@ import {
 } from 'typeorm';
 import { UserSession } from './user-session.entity';
 import { UserBalance } from './user-balance.entity';
+import { UserSocket } from './user-socket.entity';
 
 /**
  * ENUMS
@@ -126,4 +127,7 @@ export class User {
 
   @OneToMany(() => UserSession, (session) => session.user)
   sessions?: UserSession[];
+
+  @OneToMany(() => UserSocket, (socket) => socket.user)
+  sockets: UserSocket[];
 }

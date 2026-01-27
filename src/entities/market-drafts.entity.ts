@@ -4,7 +4,10 @@ import {
   Column,
   Index,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Market } from './markets.entity';
 
 @Entity('market_drafts')
 @Index(['creatorWallet'])
@@ -51,4 +54,8 @@ export class MarketDraft {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToOne(() => Market, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  linkedMarket?: Market;
 }
