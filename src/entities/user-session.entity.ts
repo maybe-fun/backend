@@ -12,6 +12,7 @@ import { User } from './user.entity';
 @Entity('user_sessions')
 @Index(['userId'])
 @Index(['expiresAt'])
+@Index(['jti'], { unique: true })
 @Index(['userId', 'revokedAt'])
 export class UserSession {
   @PrimaryGeneratedColumn('uuid')
@@ -32,6 +33,9 @@ export class UserSession {
 
   @Column({ type: 'varchar', length: 64 })
   nonce: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  jti: string;
 
   @Column({ type: 'inet', nullable: true })
   ipAddress?: string;

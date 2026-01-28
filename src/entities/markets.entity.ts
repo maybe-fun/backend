@@ -73,7 +73,7 @@ export class Market {
   creatorWallet: string;
 
   @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: 'creator_id' })
+  @JoinColumn({ name: 'creatorId' })
   creator?: User;
 
   @Column({ type: 'uuid', nullable: true })
@@ -88,6 +88,9 @@ export class Market {
 
   @Column({ type: 'uuid', nullable: true })
   categoryId?: string;
+
+  @Column({ type: 'uuid', array: true, nullable: true })
+  topics: string[];
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   imageUrl?: string;

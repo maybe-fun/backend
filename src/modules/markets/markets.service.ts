@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MarketDraft } from 'src/entities/market-drafts.entity';
 import { Market, MarketChainState } from 'src/entities/markets.entity';
@@ -7,6 +7,8 @@ import { CreateMarketDto, CreateMarketResponse } from './dto/create-market.dto';
 import { GetUserMarketsDto } from './dto/get-user-markets.dto';
 import { MarketFiltersDto } from './dto/get-markets-with-filters.dto';
 import { CacheService } from 'src/common/cache/cache.service';
+import { CategoriesService } from '../categories/categories.service';
+import { TopicsService } from '../topics/topics.service';
 
 @Injectable()
 export class MarketsService {
@@ -18,6 +20,8 @@ export class MarketsService {
     @InjectRepository(Market)
     private readonly marketRepo: Repository<Market>,
     private cache: CacheService,
+    private readonly categoryService: CategoriesService,
+    private readonly topicService: TopicsService,
   ) {}
 
   async createDraft(
@@ -94,6 +98,7 @@ export class MarketsService {
       offset,
       state,
       creator_wallet,
+      category_id,
       search,
       sort,
       order = 'DESC',
@@ -106,8 +111,8 @@ export class MarketsService {
       .skip(offset);
 
     if (state) query.andWhere('market.chainState = :state', { state });
-    // if (category_id)
-    //   query.andWhere('market.categoryId = :category_id', { category_id });
+    if (category_id)
+      query.andWhere('market.categoryId = :category_id', { category_id });
     if (creator_wallet)
       query.andWhere('market.creatorWallet = :creator_wallet', {
         creator_wallet,
@@ -159,5 +164,114 @@ export class MarketsService {
 
     await this.cache.set(CACHE_KEY, trending, 300);
     return trending;
+  }
+
+  async getClosingSoonMarkets() {
+    const now = Math.floor(Date.now() / 1000);
+    const fortyEightHours = now + 48 * 60 * 60;
+
+    const markets = await this.marketRepo
+      .createQueryBuilder('m')
+      .select([
+        'm.id',
+        'm.slug',
+        'm.question',
+        'm.tradingCloseTs',
+        'm.chainState',
+        'm.totalVolume',
+      ])
+      .where('m.chainState = :state', {
+        state: MarketChainState.OPEN,
+      })
+      .andWhere('m.tradingCloseTs BETWEEN :now AND :limit', {
+        now,
+        limit: fortyEightHours,
+      })
+      .orderBy('m.tradingCloseTs', 'ASC')
+      .limit(20)
+      .getMany();
+
+    return {
+      markets: markets.map((m) => ({
+        id: m.id,
+        slug: m.slug,
+        question: m.question,
+        trading_close_ts: m.tradingCloseTs,
+        chain_state: m.chainState,
+        total_volume: m.totalVolume,
+      })),
+    };
+  }
+
+  async getMarketBySlug(slug: string) {
+    const market = await this.marketRepo.findOne({
+      where: { slug },
+      relations: ['creator'],
+    });
+
+    if (!market || market.deletedAt) {
+      throw new NotFoundException('Market not found');
+    }
+
+    // --- LMSR pricing ---
+    // const options = this.computeMarketOptions(market);
+
+    return {
+      id: market.id,
+      pubkey: market.pubkey,
+      slug: market.slug,
+      question: market.question,
+      description: market.description,
+      chain_state: market.chainState,
+      trading_close_ts: market.tradingCloseTs,
+
+      // options,
+
+      stats: {
+        total_volume: market.totalVolume,
+        total_trades: market.totalTrades,
+        unique_traders: market.uniqueTraders,
+      },
+
+      creator: {
+        wallet_address: market.creatorWallet,
+        username: market.creator?.username ?? null,
+        avatar_url: market.creator?.avatarUrl ?? null,
+      },
+
+      category: market.categoryId
+        ? await this.categoryService.getCategoryById(market.categoryId)
+        : null,
+
+      topics: await this.topicService.getTopicsByIds(market.topics || []),
+
+      resolution:
+        market.chainState === MarketChainState.FINALIZED
+          ? {
+              outcome: market.resolvedOutcome,
+              proposer: market.resolutionProposer,
+              source: market.resolutionSource,
+            }
+          : null,
+    };
+  }
+
+  async getUserStats(userId: string, walletAddress: string) {
+    const marketsCreated = await this.marketRepo.count({
+      where: { creatorId: userId },
+    });
+
+    const aggregates = await this.marketRepo
+      .createQueryBuilder('m')
+      .select('COALESCE(SUM(m.totalVolume), 0)', 'totalVolume')
+      .addSelect('COALESCE(SUM(m.totalTrades), 0)', 'totalTrades')
+      .where('m.creatorWallet = :wallet', { wallet: walletAddress })
+      .getRawOne();
+
+    return {
+      markets_created: Number(marketsCreated),
+      total_volume: aggregates.totalVolume,
+      total_trades: Number(aggregates.totalTrades),
+    };
   }
 }

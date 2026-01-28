@@ -7,11 +7,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
-import { User, UserStatus } from 'src/entities/user.entity';
-import { Repository } from 'typeorm';
-// import { UserStatus } from 'src/entities/user.entity';
+import { UserStatus } from 'src/entities/user.entity';
+import { UserRepository } from 'src/modules/user/user.repository';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -19,8 +17,7 @@ export class AuthGuard implements CanActivate {
 
   constructor(
     private readonly jwtService: JwtService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly userRepository: UserRepository,
     private readonly config: ConfigService,
   ) {}
 
@@ -51,7 +48,21 @@ export class AuthGuard implements CanActivate {
         );
       }
 
+      const currentSession = await this.userRepository.getSessionByJti(
+        payload.jti,
+      );
+      if (
+        !currentSession ||
+        currentSession.expiresAt < new Date() ||
+        currentSession.revokedAt
+      ) {
+        throw new UnauthorizedException(
+          'Session has expired or been revoked. Please log in again.',
+        );
+      }
+
       request.user = instanceToPlain(user);
+      request.user.jti = payload.jti;
       return true;
     } catch (error) {
       this.logger.error(error.message);

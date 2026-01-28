@@ -19,6 +19,10 @@ import { CacheModule } from './common/cache/cache.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { GuardModule } from './common/guards/guard.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { TopicsModule } from './modules/topics/topics.module';
 
 @Module({
   imports: [
@@ -81,6 +85,10 @@ import { GuardModule } from './common/guards/guard.module';
     AuthModule,
     UserModule,
     GuardModule,
+    NotificationsModule,
+    WebhooksModule,
+    CategoriesModule,
+    TopicsModule,
   ],
   controllers: [AppController],
   providers: [
