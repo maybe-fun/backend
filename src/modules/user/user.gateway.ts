@@ -24,7 +24,8 @@ const options = {
 @WebSocketGateway(options)
 export class UserGateway
   extends BaseGateway
-  implements OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   private readonly logger = new Logger(UserGateway.name);
   constructor(private readonly userRepository: UserRepository) {
     super();

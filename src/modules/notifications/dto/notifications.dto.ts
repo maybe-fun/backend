@@ -32,4 +32,3 @@ export class GetNotificationsDto {
   @IsEnum(NotificationType)
   type?: NotificationType;
 }
-

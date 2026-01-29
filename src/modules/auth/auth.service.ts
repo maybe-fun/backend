@@ -22,7 +22,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly dataSource: DataSource,
     @InjectRepository(UserSession) private sessionRepo: Repository<UserSession>,
-  ) { }
+  ) {}
 
   async verifySignature(dto: VerifyWalletDto) {
     const { wallet_address, signature, nonce } = dto;
@@ -77,9 +77,15 @@ export class AuthService {
       walletAddress: user.walletAddress,
       expiresAt: new Date(
         Date.now() +
-        Math.floor(this.configService.get('auth.refreshExpiresIn') as number),
+          Math.floor(this.configService.get('auth.refreshExpiresIn') as number),
       ), // 7 days
     });
+
+    await this.cacheService.set(
+      `refresh_token:${jti}`,
+      hashToken(refreshToken),
+      Math.floor(this.configService.get('auth.refreshExpiresIn') / 1000),
+    );
 
     await this.cacheService.set(
       `refresh_token:${jti}`,
@@ -166,7 +172,7 @@ export class AuthService {
       refreshTokenHash: hashToken(newRefreshToken),
       expiresAt: new Date(
         Date.now() +
-        Math.floor(this.configService.get('auth.refreshExpiresIn') as number),
+          Math.floor(this.configService.get('auth.refreshExpiresIn') as number),
       ),
     });
 
