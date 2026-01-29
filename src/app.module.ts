@@ -23,6 +23,8 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { TopicsModule } from './modules/topics/topics.module';
+import { FavoriteModule } from './modules/favorite/favorite.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
   imports: [
@@ -89,6 +91,8 @@ import { TopicsModule } from './modules/topics/topics.module';
     WebhooksModule,
     CategoriesModule,
     TopicsModule,
+    FavoriteModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [
