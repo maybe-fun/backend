@@ -6,17 +6,15 @@ import {
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import configuration from 'config';
 import { Socket } from 'socket.io';
 import { BaseGateway } from 'src/common/base.gateway';
 import { WsAuthGuard } from 'src/common/guards/ws-auth.guard';
 import { UserRepository } from 'src/modules/user/user.repository';
 import { UserCreatedEvent, UserEvents } from './events/user.event';
 
-const config = configuration();
 const options = {
   cors: {
-    origin: config.env === 'production' ? [/panelsuite\.io$/] : '*',
+    origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
   },

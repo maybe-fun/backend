@@ -87,6 +87,12 @@ export class AuthService {
       Math.floor(this.configService.get('auth.refreshExpiresIn') / 1000),
     );
 
+    await this.cacheService.set(
+      `refresh_token:${jti}`,
+      hashToken(refreshToken),
+      Math.floor(this.configService.get('auth.refreshExpiresIn') / 1000),
+    );
+
     return {
       user,
       access_token: accessToken,
@@ -114,7 +120,6 @@ export class AuthService {
     const cachedHash = await this.cacheService.get<string>(
       `refresh_token:${jti}`,
     );
-    console.log('Cached Hash:', cachedHash);
 
     if (!cachedHash || cachedHash !== tokenHash) {
       await this.revokeAllSessions(sub);

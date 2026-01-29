@@ -89,7 +89,7 @@ export class PushService {
 
     if (!devices.length) return;
 
-    const tokens = devices.map((d) => d.fcmToken);
+    const tokens = [...new Set(devices.map((d) => d.fcmToken))];
 
     const response = await admin.messaging().sendEachForMulticast({
       tokens,

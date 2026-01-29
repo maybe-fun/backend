@@ -38,5 +38,9 @@ export class NotificationHandlerService {
         actionUrl: notification.actionUrl ?? '',
       },
     });
+
+    notification.pushSent = true;
+    notification.pushSentAt = new Date(Date.now());
+    await this.notificationRepo.save(notification);
   }
 }

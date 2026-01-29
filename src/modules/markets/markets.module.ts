@@ -15,15 +15,29 @@ import { UserModule } from '../user/user.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { TopicsModule } from '../topics/topics.module';
+import { MarketOption } from 'src/entities/market-option.entity';
+import { MarketStats } from 'src/entities/market-stats.entity';
+import { MarketTopic } from 'src/entities/market-topic.entity';
+import { CommentModule } from '../comment/comment.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Market, MarketDraft, User, Category, Topic]),
+    TypeOrmModule.forFeature([
+      Market,
+      MarketDraft,
+      MarketOption,
+      MarketStats,
+      MarketTopic,
+      User,
+      Category,
+      Topic,
+    ]),
     JwtModule,
     GuardModule,
     NotificationsModule,
     CategoriesModule,
     TopicsModule,
+    CommentModule,
     forwardRef(() => UserModule),
   ],
   controllers: [MarketsController],
